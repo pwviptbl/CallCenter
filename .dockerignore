@@ -1,0 +1,5 @@
+# Ignorar arquivos Docker temporários
+*.log
+
+# Ignorar arquivos de ambiente local
+.env.local

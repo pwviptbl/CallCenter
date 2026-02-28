@@ -54,7 +54,7 @@ Sem custos de licença de software. Tudo open-source exceto a API da OpenAI.
 
 | # | Etapa | Entregável | Dependência | Status |
 |---|---|---|---|---|
-| 1 | **Setup do projeto** | Laravel + Vue + PostgreSQL + Coolify + CI/CD + SAST configurados | — | ⬜ Pendente |
+| 1 | **Setup do projeto** | Laravel + Vue + PostgreSQL + Coolify + CI/CD + SAST configurados | — | ✅ Concluído |
 | 2 | **Cadastro de empresas** | CRUD completo com configuração de campos e API | Etapa 1 | ⬜ Pendente |
 | 3 | **Filtro de urgência** | Keyword match testado para todos os cenários de emergência | Etapa 1 | ⬜ Pendente |
 | 4 | **Atendimento WhatsApp + IA** | Evolution API + LLM coletando campos configurados por empresa | Etapas 2, 3 | ⬜ Pendente |

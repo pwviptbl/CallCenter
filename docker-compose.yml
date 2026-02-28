@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Backend - Laravel
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    container_name: callcenter_backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - callcenter
+    depends_on:
+      - postgres
+      - redis
+
+  # Nginx
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.Dockerfile
+    container_name: callcenter_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - callcenter
+    depends_on:
+      - backend
+
+  # Frontend - Vue 3
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+    container_name: callcenter_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - callcenter
+    depends_on:
+      - backend
+
+  # PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: callcenter_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-callcenter}
+      POSTGRES_USER: ${DB_USERNAME:-callcenter}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - callcenter
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: callcenter_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - callcenter
+
+networks:
+  callcenter:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
