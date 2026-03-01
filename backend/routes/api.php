@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\ServiceRequestController;
 use App\Http\Controllers\Api\UrgencyKeywordController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WhatsappInstanceController;
+use App\Http\Controllers\Api\WhatsappWebhookController;
+
+// ─── Webhook Evolution API (público) ─────────────────────────────────────────
+Route::post('webhook/whatsapp', [WhatsappWebhookController::class, 'handle']);
 
 // ─── Autenticação (pública) ───────────────────────────────────────────────────
 Route::prefix('v1/auth')->group(function () {

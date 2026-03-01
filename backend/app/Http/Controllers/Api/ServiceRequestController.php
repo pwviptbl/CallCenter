@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ServiceRequestUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceRequest;
 use Illuminate\Http\JsonResponse;
@@ -113,7 +114,10 @@ class ServiceRequestController extends Controller
             'attended_at'  => now(),
         ]);
 
-        return response()->json($serviceRequest->fresh(['attendant:id,name']));
+        $updated = $serviceRequest->fresh(['attendant:id,name']);
+        broadcast(new ServiceRequestUpdated($updated, 'updated'))->afterResponse();
+
+        return response()->json($updated);
     }
 
     /**
@@ -136,7 +140,10 @@ class ServiceRequestController extends Controller
 
         $serviceRequest->update([...$data, ...$extra]);
 
-        return response()->json($serviceRequest->fresh());
+        $updated = $serviceRequest->fresh();
+        broadcast(new ServiceRequestUpdated($updated, 'updated'))->afterResponse();
+
+        return response()->json($updated);
     }
 
     /**

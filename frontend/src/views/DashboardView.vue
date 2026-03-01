@@ -1,13 +1,29 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useServiceRequestStore } from '../stores/serviceRequestStore'
+import { useAuthStore } from '../stores/authStore'
+import { useEcho } from '../composables/useEcho'
 import type { ServiceRequestStatus, UrgencyLevel, Channel } from '../services/serviceRequestService'
 
 const router = useRouter()
 const store = useServiceRequestStore()
+const authStore = useAuthStore()
+const echo = useEcho()
+
 const { items, stats, loading, total, currentPage, lastPage } = storeToRefs(store)
+const { user } = storeToRefs(authStore)
+
+// Badge de evento em tempo real
+const realtimeFlash = ref(false)
+let flashTimer: ReturnType<typeof setTimeout>
+
+const flashBadge = () => {
+  realtimeFlash.value = true
+  clearTimeout(flashTimer)
+  flashTimer = setTimeout(() => (realtimeFlash.value = false), 3000)
+}
 
 // ── Filtros ────────────────────────────────────────────────────────────────
 const searchText = ref('')
@@ -46,7 +62,48 @@ const hasFilters = computed(
 // ── Ciclo de vida ──────────────────────────────────────────────────────────
 onMounted(async () => {
   await Promise.all([store.fetchStats(), store.fetchList()])
+  subscribeRealtime()
 })
+
+onUnmounted(() => {
+  if (user.value?.company_id) {
+    echo.leaveChannel(`company.${user.value.company_id}`)
+  }
+})
+
+const subscribeRealtime = () => {
+  const companyId = user.value?.company_id
+  if (!companyId) return
+
+  try {
+    echo.channel(`company.${companyId}`)
+      .listen('.service-request.created', () => {
+        store.fetchStats()
+        store.fetchList()
+        flashBadge()
+      })
+      .listen('.service-request.updated', (payload: any) => {
+        store.items.splice(
+          store.items.findIndex((i) => i.id === payload.id),
+          1,
+          { ...store.items.find((i) => i.id === payload.id)!, ...payload },
+        )
+        store.fetchStats()
+        flashBadge()
+      })
+      .listen('.service-request.escalated', () => {
+        store.fetchStats()
+        store.fetchList()
+        flashBadge()
+      })
+      .listen('.service-request.message', () => {
+        flashBadge()
+      })
+  } catch (e) {
+    // Reverb não disponível — modo offline, polling manual apenas
+    console.warn('[WS] Reverb indisponível, modo manual.')
+  }
+}
 
 // ── Helpers visuais ────────────────────────────────────────────────────────
 const urgencyLabel: Record<string, string> = {
@@ -107,7 +164,14 @@ const openDetail = (id: number) => router.push({ name: 'service-request-detail',
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Painel de Atendimento</h1>
-          <p class="text-sm text-gray-500 mt-0.5">Solicitações em tempo real</p>
+          <p class="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
+            Solicitações em tempo real
+            <span
+              :class="realtimeFlash ? 'bg-green-500 animate-ping' : 'bg-green-400'"
+              class="inline-block w-2 h-2 rounded-full transition-colors"
+              title="Tempo real ativo"
+            />
+          </p>
         </div>
         <button
           @click="store.fetchStats(); store.fetchList()"

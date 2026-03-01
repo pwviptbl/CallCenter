@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    // ── OpenAI ──────────────────────────────────────────────────────────────
+    'openai' => [
+        'api_key'      => env('OPENAI_API_KEY', ''),
+        'organization' => env('OPENAI_ORGANIZATION'),
+        'model'        => env('OPENAI_MODEL', 'gpt-4o-mini'),
+    ],
+
+    // ── IA Coletor ──────────────────────────────────────────────────────────
+    'ai' => [
+        'max_turns' => (int) env('AI_MAX_TURNS', 8),
+    ],
+
+    // ── Evolution API ────────────────────────────────────────────────────────
+    'evolution' => [
+        'secret'   => env('EVOLUTION_API_SECRET'),
+        'base_url' => env('EVOLUTION_API_BASE_URL', 'http://localhost:8081'),
+    ],
+
 ];
