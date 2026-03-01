@@ -18,6 +18,21 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue')
+    },
+    {
+      path: '/companies',
+      name: 'companies',
+      component: () => import('../views/CompanyListView.vue')
+    },
+    {
+      path: '/companies/new',
+      name: 'company-create',
+      component: () => import('../views/CompanyFormView.vue')
+    },
+    {
+      path: '/companies/:id/edit',
+      name: 'company-edit',
+      component: () => import('../views/CompanyFormView.vue')
     }
   ]
 })
