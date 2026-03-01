@@ -17,6 +17,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/service-requests/:id',
+      name: 'service-request-detail',
+      component: () => import('../views/ServiceRequestDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/companies',
       name: 'companies',
       component: () => import('../views/CompanyListView.vue'),
