@@ -13,14 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed users first (before companies)
+        $this->call([
+            UserSeeder::class,
+        ]);
 
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            ['name' => 'Test User']
-        );
-
-        // Seed companies
+        // Seed companies and keywords
         $this->call([
             CompanySeeder::class,
             UrgencyKeywordSeeder::class,
