@@ -129,14 +129,16 @@
 |---|---|---|
 | `id` | UUID, PK | Identificador único |
 | `name` | VARCHAR(255) | Nome do operador |
-| `email` | VARCHAR(255), UNIQUE | E-mail de login |
+| `email` | VARCHAR(255), UNIQUE | E-mail de login (Sanctum) |
 | `password` | VARCHAR(255) | Hash bcrypt |
-| `role` | ENUM('admin', 'supervisor', 'attendant') | Perfil de acesso |
-| `is_active` | BOOLEAN, DEFAULT true | Se o usuário está ativo |
+| `role` | ENUM('admin', 'attendant') | Perfil de acesso — [detalhes em Perfis](perfis.md) |
+| `is_active` | BOOLEAN, DEFAULT true | Se o usuário está ativo (bloqueado = sem acesso) |
+| `company_id` | UUID, FK, nullable | Empresa atual do usuário (para contexto) |
+| `last_login_at` | TIMESTAMP, nullable | Último acesso |
 | `created_at` | TIMESTAMP | Criação |
 | `updated_at` | TIMESTAMP | Última atualização |
 
-**Observação**: são os funcionários do callcenter, não das empresas clientes.
+**Observação**: são os funcionários do callcenter, não das empresas clientes. **Admin** tem permissão completa; **Attendant** acessa apenas o painel de atendimento.
 
 ---
 

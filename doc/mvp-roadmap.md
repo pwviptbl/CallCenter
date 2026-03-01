@@ -20,7 +20,7 @@ O MVP valida o **fluxo central**: receber contato → identificar empresa → co
 | ✅ | Registro de todas as solicitações | Com dados coletados, canal, empresa, status |
 | ✅ | Integração via API (Modo 1) | POST para endpoint configurado, registro de resposta |
 | ✅ | Tela de atendimento assistido (Modo 2) | Dados organizados em tela para abertura manual |
-| ✅ | Autenticação e permissões | Não é opcional — é o dia zero |
+| ✅ | **Autenticação e perfis (Admin/Atendente)** | **Dois perfis com permissões diferenciadas — ver [Perfis de Usuário](perfis.md)** |
 | ✅ | Keywords de urgência configuráveis | Padrões: preso, fumaca, queda, socorro, fogo |
 
 ### O que fica para fase 2

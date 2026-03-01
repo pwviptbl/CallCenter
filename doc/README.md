@@ -14,6 +14,7 @@
 | [Canais](canais.md) | WhatsApp (Evolution API), VOIP (Asterisk), configuração por empresa |
 | [API e Integrações](api.md) | Modos de integração, contratos de API, mapeamento de campos |
 | [Painel do Atendente](painel.md) | Painel de solicitações, tempo real, filtros e buscas |
+| **[Perfis de Usuário](perfis.md)** | **Admin vs Atendente: permissões, funcionalidades, endpoints** |
 | [Segurança](seguranca.md) | Autenticação, isolamento de dados, criptografia, sem RLS |
 | [Testes](testes.md) | Estratégia de testes automatizados e piloto |
 | [MVP e Roadmap](mvp-roadmap.md) | Escopo do MVP, fases, cronograma de entrega |

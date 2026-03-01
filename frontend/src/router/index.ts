@@ -27,43 +27,62 @@ const router = createRouter({
       path: '/companies',
       name: 'companies',
       component: () => import('../views/CompanyListView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/companies/new',
       name: 'company-create',
       component: () => import('../views/CompanyFormView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/companies/:id/edit',
       name: 'company-edit',
       component: () => import('../views/CompanyFormView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/urgency-keywords',
       name: 'urgency-keywords',
       component: () => import('../views/UrgencyKeywordListView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/urgency-keywords/new',
       name: 'urgency-keyword-create',
       component: () => import('../views/UrgencyKeywordFormView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/urgency-keywords/:id/edit',
       name: 'urgency-keyword-edit',
       component: () => import('../views/UrgencyKeywordFormView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/urgency-keywords/tester',
       name: 'urgency-keyword-tester',
       component: () => import('../views/UrgencyKeywordTesterView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    // ── Gestão de Usuários (admin only) ────────────────────────────────────────
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('../views/UserListView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/users/new',
+      name: 'user-create',
+      component: () => import('../views/UserFormView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/users/:id/edit',
+      name: 'user-edit',
+      component: () => import('../views/UserFormView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -86,6 +105,12 @@ router.beforeEach(async (to, from, next) => {
 
   // Se está tentando acessar login e já está autenticado
   if (to.name === 'login' && authStore.isAuthenticated) {
+    next({ name: 'dashboard' })
+    return
+  }
+
+  // Se a rota requer admin e usuário não é admin
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
     next({ name: 'dashboard' })
     return
   }

@@ -10,66 +10,70 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Login user and return token
-     */
+    /** POST /api/v1/auth/login */
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'email'    => 'required|email',
+            'password' => 'required|string',
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['As credenciais fornecidas não combinam com nossos registros.'],
+                'email' => ['Credenciais inválidas.'],
             ]);
         }
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        if (! $user->is_active) {
+            return response()->json([
+                'message' => 'Sua conta está desativada. Contate o administrador.',
+            ], 403);
+        }
+
+        // Atualizar último login
+        $user->update(['last_login_at' => now()]);
+
+        // Revogar tokens antigos e gerar novo
+        $user->tokens()->delete();
+        $token = $user->createToken('api')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user'  => $this->userResource($user),
             'token' => $token,
-        ], 200);
+        ]);
     }
 
-    /**
-     * Get current authenticated user
-     */
+    /** GET /api/v1/auth/me */
     public function me(Request $request)
     {
         return response()->json([
-            'user' => $request->user(),
-        ], 200);
+            'user' => $this->userResource($request->user()),
+        ]);
     }
 
-    /**
-     * Logout user (revoke token)
-     */
+    /** POST /api/v1/auth/logout */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logout realizado com sucesso',
-        ], 200);
+        return response()->json(['message' => 'Logout realizado com sucesso.']);
     }
 
-    /**
-     * Refresh token
-     */
-    public function refresh(Request $request)
-    {
-        $user = $request->user();
-        $request->user()->currentAccessToken()->delete();
-        $token = $user->createToken('auth-token')->plainTextToken;
+    // ─── Private ──────────────────────────────────────────────────────────────
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 200);
+    private function userResource(User $user): array
+    {
+        return [
+            'id'           => $user->id,
+            'name'         => $user->name,
+            'email'        => $user->email,
+            'role'         => $user->role,
+            'is_active'    => $user->is_active,
+            'company_id'   => $user->company_id,
+            'last_login_at'=> $user->last_login_at?->toIso8601String(),
+            'created_at'   => $user->created_at?->toIso8601String(),
+        ];
     }
 }

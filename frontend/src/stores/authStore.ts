@@ -11,6 +11,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Computed
   const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
+  const isAttendant = computed(() => user.value?.role === 'attendant')
 
   // Estados
   const setToken = (newToken: string) => {
@@ -104,6 +106,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     isAuthenticated,
+    isAdmin,
+    isAttendant,
     login,
     logout,
     me,

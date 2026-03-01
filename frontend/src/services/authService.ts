@@ -4,8 +4,11 @@ export interface User {
   id: number
   name: string
   email: string
+  role: 'admin' | 'attendant'
+  is_active: boolean
+  company_id: number | null
+  last_login_at: string | null
   created_at: string
-  updated_at: string
 }
 
 export interface LoginRequest {

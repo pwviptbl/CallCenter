@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -12,30 +13,25 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
+        // ── Admin padrão do sistema ────────────────────────────────────────────
         User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'admin@callcenter.local'],
             [
-                'name' => 'Administrador',
-                'password' => bcrypt('admin123'),
+                'name'      => 'Administrador',
+                'password'  => Hash::make('Admin@123'),
+                'role'      => User::ROLE_ADMIN,
+                'is_active' => true,
             ]
         );
 
-        // Create test user
+        // ── Atendente de exemplo ───────────────────────────────────────────────
         User::firstOrCreate(
-            ['email' => 'user@example.com'],
+            ['email' => 'atendente@callcenter.local'],
             [
-                'name' => 'Usuário Teste',
-                'password' => bcrypt('user123'),
-            ]
-        );
-
-        // Create additional test users
-        User::firstOrCreate(
-            ['email' => 'operador@example.com'],
-            [
-                'name' => 'Operador CallCenter',
-                'password' => bcrypt('operador123'),
+                'name'      => 'Atendente Demo',
+                'password'  => Hash::make('Atend@123'),
+                'role'      => User::ROLE_ATTENDANT,
+                'is_active' => true,
             ]
         );
     }

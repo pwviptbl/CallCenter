@@ -29,13 +29,13 @@ const handleLogin = async () => {
 }
 
 const fillDemoAdmin = () => {
-  email.value = 'admin@example.com'
-  password.value = 'admin123'
+  email.value = 'admin@callcenter.local'
+  password.value = 'Admin@123'
 }
 
 const fillDemoUser = () => {
-  email.value = 'user@example.com'
-  password.value = 'user123'
+  email.value = 'atendente@callcenter.local'
+  password.value = 'Atend@123'
 }
 </script>
 
@@ -65,8 +65,8 @@ const fillDemoUser = () => {
           <div class="ml-3 text-sm">
             <p class="font-medium text-blue-800">Credenciais de demonstração:</p>
             <div class="mt-2 space-y-1 text-blue-700">
-              <p><strong>Admin:</strong> admin@example.com / admin123</p>
-              <p><strong>Usuário:</strong> user@example.com / user123</p>
+              <p><strong>Admin:</strong> admin@callcenter.local / Admin@123</p>
+              <p><strong>Atendente:</strong> atendente@callcenter.local / Atend@123</p>
             </div>
           </div>
         </div>

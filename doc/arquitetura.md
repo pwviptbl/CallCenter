@@ -105,7 +105,7 @@ O filtro roda **antes** de qualquer IA, é síncrono e baseado em regex/keyword 
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/     # Controllers REST API
-│   │   ├── Middleware/       # Auth, rate limiting
+│   │   ├── Middleware/       # Auth, rate limiting, role-based access
 │   │   └── Requests/        # Form requests / validação
 │   ├── Models/              # Eloquent models
 │   ├── Services/
@@ -125,6 +125,24 @@ O filtro roda **antes** de qualquer IA, é síncrono e baseado em regex/keyword 
 └── config/
     └── urgency.php          # Keywords padrão de urgência
 ```
+
+## Autenticação e Perfis de Usuário
+
+O sistema implementa dois perfis de usuário com permissões diferenciadas:
+
+| Aspecto | Detalhe |
+|---|---|
+| **Método** | Laravel Sanctum (token-based SPA auth) |
+| **Token** | API token com namespace, expiração configurable |
+| **Perfis** | Admin (gerenciamento) e Atendente (operação) |
+| **Middleware** | `RequireAdmin` para rotas admin-only; `RequireActiveUser` para bloquear inativos |
+| **Frontend Guard** | Router meta `requiresAdmin` previne acesso não-autorizado |
+
+**Admin**: Acesso completo a CRUD de empresas, usuários, keywords, configurações, painel de atendimento.
+
+**Atendente**: Acesso ao painel de atendimento e funcionalidades de teste/análise. Sem acesso a gerenciamento.
+
+**Mais detalhes em [Perfis de Usuário](perfis.md).**
 
 ## Deploy e Infraestrutura
 

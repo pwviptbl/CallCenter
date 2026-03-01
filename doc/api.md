@@ -10,74 +10,88 @@ O sistema expõe APIs REST para o frontend (SPA) e recebe webhooks dos canais (W
 - **Webhooks (Evolution API)**: Secret compartilhado no header
 - **APIs externas dos clientes**: Token/Key configurado por empresa (cifrado AES-256)
 
+### Permissões de Acesso
+
+Todos os endpoints requerem autenticação (token Sanctum válido) e usuário ativo. Alguns requerem perfil específico:
+
+- **`[TODOS]`**: Endereçado por qualquer usuário autenticado
+- **`[ADMIN]`**: Apenas usuário com `role = 'admin'`
+- **`[ATEND]`**: Apenas usuário com `role = 'attendant'` (ou admin operando como atendente)
+
+Veja [Perfis de Usuário](perfis.md) para detalhes das permissões.
+
 ---
 
 ## Endpoints Internos (Backend → Frontend)
 
 ### Autenticação
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/api/auth/login` | Login do operador |
-| POST | `/api/auth/logout` | Logout |
-| GET | `/api/auth/me` | Dados do usuário logado |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| POST | `/api/auth/login` | Público | Login do operador |
+| POST | `/api/auth/logout` | `[TODOS]` | Logout |
+| GET | `/api/auth/me` | `[TODOS]` | Dados do usuário logado |
 
 ### Empresas (Companies)
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/companies` | Listar empresas (paginado, filtros) |
-| POST | `/api/companies` | Criar empresa |
-| GET | `/api/companies/{id}` | Detalhes da empresa |
-| PUT | `/api/companies/{id}` | Atualizar empresa |
-| DELETE | `/api/companies/{id}` | Soft delete empresa |
-| POST | `/api/companies/{id}/test-api` | Testar conexão com API externa |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/companies` | `[ADMIN]` | Listar empresas (paginado, filtros) |
+| POST | `/api/companies` | `[ADMIN]` | Criar empresa |
+| GET | `/api/companies/{id}` | `[ADMIN]` | Detalhes da empresa |
+| PUT | `/api/companies/{id}` | `[ADMIN]` | Atualizar empresa |
+| DELETE | `/api/companies/{id}` | `[ADMIN]` | Deletar empresa |
+| POST | `/api/companies/{id}/test-api` | `[ADMIN]` | Testar conexão com API external |
 
 ### Solicitações (Service Requests)
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/service-requests` | Listar solicitações (paginado, filtros) |
-| GET | `/api/service-requests/{id}` | Detalhes da solicitação |
-| PUT | `/api/service-requests/{id}/assign` | Assumir atendimento (atendente) |
-| PUT | `/api/service-requests/{id}/status` | Atualizar status |
-| POST | `/api/service-requests/{id}/retry-api` | Retentar envio via API |
-| GET | `/api/service-requests/{id}/messages` | Histórico de mensagens |
-| POST | `/api/service-requests/{id}/messages` | Enviar mensagem (atendente) |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/service-requests` | `[TODOS]` | Listar solicitações (paginado, filtros) |
+| GET | `/api/service-requests/{id}` | `[TODOS]` | Detalhes da solicitação |
+| PUT | `/api/service-requests/{id}/assign` | `[TODOS]` | Assumir atendimento |
+| PUT | `/api/service-requests/{id}/status` | `[TODOS]` | Atualizar status |
+| POST | `/api/service-requests/{id}/retry-api` | `[TODOS]` | Retentar envio via API |
+| GET | `/api/service-requests/{id}/messages` | `[TODOS]` | Histórico de mensagens |
+| POST | `/api/service-requests/{id}/messages` | `[TODOS]` | Enviar mensagem |
 
 ### Keywords de Urgência
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/urgency-keywords` | Listar keywords (global + por empresa) |
-| POST | `/api/urgency-keywords` | Criar keyword |
-| PUT | `/api/urgency-keywords/{id}` | Atualizar keyword |
-| DELETE | `/api/urgency-keywords/{id}` | Desativar keyword |
-| POST | `/api/urgency-keywords/test` | Testar mensagem contra keywords |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/urgency-keywords` | `[ADMIN]` | Listar keywords |
+| POST | `/api/urgency-keywords` | `[ADMIN]` | Criar keyword |
+| PUT | `/api/urgency-keywords/{id}` | `[ADMIN]` | Atualizar keyword |
+| DELETE | `/api/urgency-keywords/{id}` | `[ADMIN]` | Deletar keyword |
+| POST | `/api/urgency-keywords/test` | `[TODOS]` | Testar mensagem contra keywords |
+| POST | `/api/urgency-keywords/analyze` | `[TODOS]` | Análise detalhada de urgência |
 
 ### WhatsApp Instances
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/whatsapp-instances` | Listar instâncias |
-| POST | `/api/whatsapp-instances` | Criar instância |
-| GET | `/api/whatsapp-instances/{id}/qrcode` | Obter QR code para parear |
-| GET | `/api/whatsapp-instances/{id}/status` | Status da conexão |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/whatsapp-instances` | `[ADMIN]` | Listar instâncias |
+| POST | `/api/whatsapp-instances` | `[ADMIN]` | Criar instância |
+| GET | `/api/whatsapp-instances/{id}/qrcode` | `[ADMIN]` | Obter QR code |
+| GET | `/api/whatsapp-instances/{id}/status` | `[ADMIN]` | Status da conexão |
 
 ### Usuários
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/users` | Listar operadores |
-| POST | `/api/users` | Criar operador |
-| PUT | `/api/users/{id}` | Atualizar operador |
-| DELETE | `/api/users/{id}` | Desativar operador |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/users` | `[ADMIN]` | Listar operadores |
+| POST | `/api/users` | `[ADMIN]` | Criar operador |
+| GET | `/api/users/{id}` | `[ADMIN]` | Detalhes do operador |
+| PUT | `/api/users/{id}` | `[ADMIN]` | Atualizar operador |
+| DELETE | `/api/users/{id}` | `[ADMIN]` | Deletar operador |
+| PATCH | `/api/users/{id}/toggle-active` | `[ADMIN]` | Ativar/bloquear operador |
+| PATCH | `/api/users/{id}/set-role` | `[ADMIN]` | Alterar perfil (admin/attendant) |
 
 ### Dashboard / Relatórios (fase 2)
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/dashboard/stats` | Estatísticas gerais |
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| GET | `/api/dashboard/stats` | `[ADMIN]` | Estatísticas gerais |
 | GET | `/api/dashboard/stats/company/{id}` | Estatísticas por empresa |
 
 ---

@@ -51,30 +51,39 @@ class ServiceRequest extends Model
 
 ### 2. Autorização (Roles e Permissões)
 
+O sistema implementa **dois perfis de usuário** com permissões diferenciadas:
+
+| Recurso | Admin | Atendente |
+|---------|-------|-----------|
+| Gerenciar Usuários | ✅ CRUD completo | ❌ Acesso próprio apenas |
+| Gerenciar Empresas | ✅ CRUD completo | ❌ Apenas leitura |
+| Filtro de Urgência | ✅ CRUD keywords | ✅ Apenas teste/análise |
+| Painel de Atendimento | ✅ Acesso completo | ✅ Acesso completo |
+| Configurações | ✅ Acesso completo | ❌ Sem acesso |
+
+**Implementação:**
+
 ```
 Admin
-├── CRUD empresas
-├── CRUD usuários
+├── CRUD empresas (criar, editar, deletar)
+├── CRUD usuários (criar, editar, deletar, promover/revogar admin, bloquear/ativar)
 ├── CRUD keywords de urgência
 ├── Configurações do sistema
-├── Visualizar tudo
-└── Todas as permissões abaixo
-
-Supervisor
-├── Visualizar todas as solicitações
-├── Reatribuir atendimentos
-├── Relatórios e estatísticas
-└── Todas as permissões abaixo
+└── Painel completo (todas as empresas)
 
 Atendente
-├── Visualizar fila de atendimentos
-├── Assumir atendimentos
-├── Enviar mensagens
-├── Confirmar abertura de chamados
-└── Visualizar histórico (apenas seus atendimentos + fila)
+├── Painel de atendimento (fila, assumir atendimentos)
+├── Testar/analisar keywords
+└── Visualizar dados públicos do sistema
 ```
 
-Implementado com **spatie/laravel-permission**.
+**Detalhes completos em [Perfis de Usuário](perfis.md).**
+
+**Implementado com:**
+- Laravel Sanctum (autenticação por token)
+- Middleware `RequireAdmin` para proteção de rotas
+- Middleware `RequireActiveUser` para bloquear usuários inativos
+- Guards no router Vue.js (`requiresAdmin` meta)
 
 ### 3. Criptografia de Credenciais de API
 
