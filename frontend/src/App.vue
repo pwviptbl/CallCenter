@@ -22,6 +22,15 @@ const handleLogout = async () => {
 
 onMounted(async () => {
   await authStore.initAuth()
+  
+  // Após carregar auth, redirecionar se necessário
+  if (route.path === '/' || route.path === '') {
+    if (isAuthenticated.value) {
+      router.push({ name: 'dashboard' })
+    } else {
+      router.push({ name: 'login' })
+    }
+  }
 })
 </script>
 
