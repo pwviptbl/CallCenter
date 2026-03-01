@@ -115,8 +115,7 @@ class ServiceRequestController extends Controller
         ]);
 
         $updated = $serviceRequest->fresh(['attendant:id,name']);
-        broadcast(new ServiceRequestUpdated($updated, 'updated'))->afterResponse();
-
+        broadcast(new ServiceRequestUpdated($updated, 'updated'));
         return response()->json($updated);
     }
 
@@ -141,8 +140,7 @@ class ServiceRequestController extends Controller
         $serviceRequest->update([...$data, ...$extra]);
 
         $updated = $serviceRequest->fresh();
-        broadcast(new ServiceRequestUpdated($updated, 'updated'))->afterResponse();
-
+        broadcast(new ServiceRequestUpdated($updated, 'updated'));
         return response()->json($updated);
     }
 

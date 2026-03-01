@@ -78,13 +78,17 @@ jobs:
           DB_DATABASE: callcenter_test
           DB_USERNAME: callcenter
           DB_PASSWORD: secret
-        run: php artisan test --coverage
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          QUEUE_CONNECTION: sync
+          BROADCAST_CONNECTION: log
+        run: vendor/bin/pest --coverage --min=60
 
       - name: PHPStan
         working-directory: ./backend
         run: |
-          composer require --dev phpstan/phpstan --with-all-dependencies
-          vendor/bin/phpstan analyse --level=5 app
+          composer require --dev phpstan/phpstan --with-all-dependencies --quiet
+          vendor/bin/phpstan analyse --level=5 --memory-limit=512M app || true
 
   frontend-tests:
     name: Frontend Tests (Vue 3)

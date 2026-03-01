@@ -103,7 +103,7 @@ class WhatsappWebhookController extends Controller
                 'channel'              => ServiceRequest::CHANNEL_WHATSAPP,
             ]);
 
-            broadcast(new ServiceRequestUpdated($sr, 'created'))->afterResponse();
+            broadcast(new ServiceRequestUpdated($sr, 'created'));
         }
 
         // Salva a mensagem inbound (evita duplicatas pelo ID do WhatsApp)
@@ -162,8 +162,11 @@ class WhatsappWebhookController extends Controller
             return; // Já é crítico, não rebaixa
         }
 
-        $keywords = \App\Models\UrgencyKeyword::where('company_id', $sr->company_id)
-            ->where('is_active', true)
+        $keywords = \App\Models\UrgencyKeyword::where('active', true)
+            ->where(function ($q) use ($sr) {
+                $q->whereNull('company_id')
+                  ->orWhere('company_id', $sr->company_id);
+            })
             ->get();
 
         $lower   = mb_strtolower($content);
@@ -195,7 +198,7 @@ class WhatsappWebhookController extends Controller
                 ),
             ]);
 
-            broadcast(new ServiceRequestUpdated($sr->fresh(), 'urgency'))->afterResponse();
+            broadcast(new ServiceRequestUpdated($sr->fresh(), 'urgency'));
         }
     }
 }

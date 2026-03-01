@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\ServiceRequestUpdated;
+use App\Jobs\DispatchToCompanyApiJob;
 use App\Models\Message;
 use App\Models\ServiceRequest;
 use App\Services\AiCollectorService;
@@ -86,27 +87,37 @@ class ProcessAiMessageJob implements ShouldQueue
             'is_read'     => false,
         ]);
 
-        broadcast(new ServiceRequestUpdated($sr->fresh(), 'message'))->afterResponse();
+        broadcast(new ServiceRequestUpdated($sr->fresh(), 'message'));
     }
 
     private function completeCollection(ServiceRequest $sr, string $rawContent, array $data): void
     {
+        $company = $sr->company;
+        $hasApi  = $company?->api_enabled && $company?->api_endpoint;
+
         $sr->update([
-            'status'         => ServiceRequest::STATUS_AWAITING_REVIEW,
+            'status'         => $hasApi ? ServiceRequest::STATUS_SENT_API : ServiceRequest::STATUS_AWAITING_REVIEW,
             'collected_data' => $data,
         ]);
 
-        // Salva a última mensagem da IA confirmando a coleta
+        // Despacha para a API da empresa se estiver configurada
+        if ($hasApi) {
+            DispatchToCompanyApiJob::dispatch($sr->id)->onQueue('default');
+        }
+
+        $confirmMsg = $hasApi
+            ? 'Obrigado! Suas informações foram registradas e encaminhadas. Você receberá uma confirmação em breve.'
+            : 'Obrigado! Coletei todas as informações necessárias. Um atendente irá dar continuidade ao seu atendimento em breve.';
+
         $sr->messages()->create([
             'direction'   => Message::DIRECTION_OUTBOUND,
             'sender_type' => Message::SENDER_AI,
-            'content'     => 'Obrigado! Coletei todas as informações necessárias. Um atendente irá dar continuidade ao seu atendimento em breve.',
+            'content'     => $confirmMsg,
             'is_read'     => false,
         ]);
 
-        broadcast(new ServiceRequestUpdated($sr->fresh(), 'updated'))->afterResponse();
-
-        Log::info("[AI Job] SR #{$sr->id} coleta concluída. Dados: " . json_encode($data));
+        broadcast(new ServiceRequestUpdated($sr->fresh(), 'updated'));
+        Log::info("[AI Job] SR #{$sr->id} coleta concluída. API dispatch: " . ($hasApi ? 'sim' : 'não'));
     }
 
     private function escalateToHuman(ServiceRequest $sr, string $reason): void
@@ -120,8 +131,7 @@ class ProcessAiMessageJob implements ShouldQueue
             'is_read'     => false,
         ]);
 
-        broadcast(new ServiceRequestUpdated($sr->fresh(), 'escalated'))->afterResponse();
-
+        broadcast(new ServiceRequestUpdated($sr->fresh(), 'escalated'));
         Log::info("[AI Job] SR #{$sr->id} escalado. Motivo: {$reason}");
     }
 }
