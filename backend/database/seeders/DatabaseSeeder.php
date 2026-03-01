@@ -23,5 +23,18 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             UrgencyKeywordSeeder::class,
         ]);
+
+        // Associa usuários padrão à primeira empresa (se ainda sem empresa)
+        $firstCompany = \App\Models\Company::first();
+        if ($firstCompany) {
+            \App\Models\User::whereNull('company_id')
+                ->whereIn('email', ['admin@callcenter.local', 'atendente@callcenter.local'])
+                ->update(['company_id' => $firstCompany->id]);
+        }
+
+        // Seed service requests and messages demo
+        $this->call([
+            ServiceRequestSeeder::class,
+        ]);
     }
 }

@@ -88,6 +88,18 @@ class Company extends Model
         ];
     }
 
+    // ── Relações ─────────────────────────────────────────────────────────────
+
+    public function whatsappInstances()
+    {
+        return $this->hasMany(WhatsappInstance::class);
+    }
+
+    public function serviceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
+
     /**
      * Scope a query to only include active companies.
      */

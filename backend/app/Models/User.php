@@ -46,6 +46,16 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
+    public function attendingRequests()
+    {
+        return $this->hasMany(ServiceRequest::class, 'attendant_id');
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
     // ─── Role helpers ──────────────────────────────────────────────────────────
 
     public function isAdmin(): bool

@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\ServiceRequestController;
 use App\Http\Controllers\Api\UrgencyKeywordController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WhatsappInstanceController;
 
 // ─── Autenticação (pública) ───────────────────────────────────────────────────
 Route::prefix('v1/auth')->group(function () {
@@ -35,6 +38,28 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'user.active'])->group(function
         Route::apiResource('users', UserController::class);
         Route::post('users/{id}/toggle-active', [UserController::class, 'toggleActive']);
         Route::post('users/{id}/set-role',       [UserController::class, 'setRole']);
+
+        // Gestão de instâncias WhatsApp (somente admin)
+        Route::apiResource('whatsapp-instances', WhatsappInstanceController::class);
+        Route::get('whatsapp-instances/{whatsappInstance}/status',
+            [WhatsappInstanceController::class, 'status']);
+        Route::patch('whatsapp-instances/{whatsappInstance}/status',
+            [WhatsappInstanceController::class, 'updateStatus']);
     });
+
+    // ── Solicitações de atendimento (admin + atendente) ───────────────────────
+    Route::get('service-requests/stats', [ServiceRequestController::class, 'stats']);
+    Route::apiResource('service-requests', ServiceRequestController::class)
+        ->only(['index', 'show', 'store']);
+    Route::post('service-requests/{serviceRequest}/assign',
+        [ServiceRequestController::class, 'assign']);
+    Route::patch('service-requests/{serviceRequest}/status',
+        [ServiceRequestController::class, 'updateStatus']);
+
+    // ── Mensagens de uma solicitação ──────────────────────────────────────────
+    Route::get('service-requests/{serviceRequest}/messages',
+        [MessageController::class, 'index']);
+    Route::post('service-requests/{serviceRequest}/messages',
+        [MessageController::class, 'store']);
 });
 
