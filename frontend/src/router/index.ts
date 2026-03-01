@@ -33,6 +33,26 @@ const router = createRouter({
       path: '/companies/:id/edit',
       name: 'company-edit',
       component: () => import('../views/CompanyFormView.vue')
+    },
+    {
+      path: '/urgency-keywords',
+      name: 'urgency-keywords',
+      component: () => import('../views/UrgencyKeywordListView.vue')
+    },
+    {
+      path: '/urgency-keywords/new',
+      name: 'urgency-keyword-create',
+      component: () => import('../views/UrgencyKeywordFormView.vue')
+    },
+    {
+      path: '/urgency-keywords/:id/edit',
+      name: 'urgency-keyword-edit',
+      component: () => import('../views/UrgencyKeywordFormView.vue')
+    },
+    {
+      path: '/urgency-keywords/tester',
+      name: 'urgency-keyword-tester',
+      component: () => import('../views/UrgencyKeywordTesterView.vue')
     }
   ]
 })
