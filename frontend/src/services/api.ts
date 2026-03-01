@@ -9,14 +9,13 @@ const apiClient: AxiosInstance = axios.create({
   timeout: 10000
 })
 
-// Request interceptor (para adicionar token de autenticação futuramente)
+// Request interceptor (para adicionar token de autenticação)
 apiClient.interceptors.request.use(
   (config) => {
-    // TODO: Adicionar token quando implementar autenticação
-    // const token = localStorage.getItem('auth_token')
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   (error) => {
